@@ -1,13 +1,17 @@
 import * as React from "react";
 
+type gender = 'male' | 'female';
+
 class Character {
   name:      string;
   rank:      rank;
   stats:     stat[];
+  gender:    gender;
   journeyed: number;
 
-  constructor(name: string, rank: rank, stats: stat[] = [], journeyed: number = Date.now()) {
+  constructor(name: string, gender: gender, rank: rank, stats: stat[] = [], journeyed: number = Date.now()) {
     this.name      = name;
+    this.gender    = gender;
     this.rank      = rank;
     this.stats     = stats;
     this.journeyed = journeyed;
@@ -65,13 +69,13 @@ const ranks = {
   squire:    new rank("Squire", "Squire", rarity.uncommon, { xp: 100 }),
   knight:    new rank("Knight", "Ser", rarity.rare, { xp: 5000 }),
   lord:      new rank("Lord", "Lord", rarity.epic, { xp: 100000 }),
-  royal:     new rank("Royal", "Regent", rarity.legendary, { xp: 1000000 }),
+  royal:     new rank("Royal", "Grace", rarity.legendary, { xp: 1000000 }),
   mythical:  new rank("Mythical", "Mythic", rarity.unique, { xp: 5000000 }),
   conqueror: new rank("Conqueror", "the Conqueror", rarity.mythic, { xp: 10000000, suffix: true }),
 };
 
 export default function Home() {
-  const character = new Character("Napoleon", ranks.lord, []);
+  const character = new Character("Napoleon", 'male', ranks.lord, []);
   
   return (
     <main
