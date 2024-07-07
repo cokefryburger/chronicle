@@ -11,7 +11,9 @@ const config = {
   prefix: "",
   theme: {
     fontFamily: {
+      gaelic: ["Eagle Lake", "sans-serif"],
       gothic: ["UnifrakturMaguntia", "sans-serif"],
+      medieval: ["MedievalSharp", "sans-serif"],
     },
     container: {
       center: true,
