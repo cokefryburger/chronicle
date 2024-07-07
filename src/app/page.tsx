@@ -1,6 +1,6 @@
 import * as React from "react";
 
-type gender = 'male' | 'female';
+type gender = "male" | "female";
 
 class Character {
   name:      string;
@@ -75,8 +75,7 @@ const ranks = {
 };
 
 export default function Home() {
-  const character = new Character("Napoleon", 'male', ranks.lord, []);
-  
+  const character = new Character("Napoleon", "male", ranks.knight, []);
   return (
     <main
       className={`
@@ -86,19 +85,55 @@ export default function Home() {
     >
       <div className="w-fit">
         <h1 className="text-6xl font-gothic">Chronicle</h1>
-        <h2 className="text-1xl font-gaelic pl-3">of {character.title}</h2>
+        <h2 className="text-1xl font-gaelic pl-3" style={{ color: character.rank.rarity }}>of {character.title}</h2>
       </div>
       <div className="flex flex-row space-x-4 w-full justify-center">
         {Object.values(ranks).map((rank, id) => (
           <p
             key={id}
-            className="text-3xl font-gaelic"
+            className="text-2xl font-gaelic"
             style={{ color: rank.rarity }}
           >
             {rank.name}
           </p>
         ))}
       </div>
+      <div className="border-2 w-full">
+        <Stats character={character} />
+      </div>
     </main>
   );
+}
+
+class ChronicleMonth {
+  month:        number;
+  year:         number;
+  amountOfDays: number;
+  startWeekday: number;
+
+  constructor(month: number, year: number) {
+    this.month        = month;
+    this.year         = year;
+    this.amountOfDays = new Date(year, month, 0).getDate();
+    this.startWeekday = new Date(year, month - 1, 1).getDay();
+  }
+}
+
+function Stats({ character }: {
+  character: Character;
+}) {
+  var currYearVal     = new Date().getFullYear();
+  var currMonthVal    = new Date().getMonth() + 1;
+  
+  var months: ChronicleMonth[] = [];
+  for (var i = 1; i <= 12; i++) { months.push(new ChronicleMonth(i, currYearVal)); }
+
+  return <></>
+}
+
+function Talismans({ character, month }: {
+  character: Character;
+  month:     ChronicleMonth;
+}) {
+  return <></>
 }
