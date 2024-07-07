@@ -1,4 +1,5 @@
 import * as React from "react";
+import { VStack, HStack } from "@/components/stacks";
 
 type gender = "male" | "female";
 
@@ -98,9 +99,7 @@ export default function Home() {
           </p>
         ))}
       </div>
-      <div className="border-2 w-full">
-        <Stats character={character} />
-      </div>
+      <Stats character={character} />
     </main>
   );
 }
@@ -117,23 +116,60 @@ class ChronicleMonth {
     this.amountOfDays = new Date(year, month, 0).getDate();
     this.startWeekday = new Date(year, month - 1, 1).getDay();
   }
+
+  get rows(): number {
+    return Math.ceil((this.amountOfDays + this.startWeekday) / 7);
+  }
+
+  get cols(): number {
+    return Math.ceil(this.amountOfDays / 7);
+  }
+
+  daysForWeek(week: number): number {
+    return Math.min(7, this.amountOfDays - (week * 7));
+  }
 }
 
-function Stats({ character }: {
-  character: Character;
-}) {
-  var currYearVal     = new Date().getFullYear();
-  var currMonthVal    = new Date().getMonth() + 1;
-  
-  var months: ChronicleMonth[] = [];
-  for (var i = 1; i <= 12; i++) { months.push(new ChronicleMonth(i, currYearVal)); }
+const monthNames = [
+  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+];
 
-  return <></>
+function Stats({ character }: { character: Character }) {
+  var currYearVal = new Date().getFullYear();
+  var currMonthVal = new Date().getMonth();
+
+  var months: ChronicleMonth[] = [];
+  for (var i = 1; i <= 12; i++)
+    months.push(new ChronicleMonth(i, currYearVal));
+  const currMonth = months[currMonthVal];
+
+  return (
+    <VStack className="items-center space-y-4 text-2xl text-[#f7a22d] font-gaelic">
+      {/* <div>
+        <h3>
+          The {currYearVal}
+          <sup>th</sup> Year
+        </h3>
+      </div> */}
+      <div>
+        {/* single month cols of 7 days for now */}
+        <HStack>
+          {Array.from({ length: currMonth.cols }).map((_, id) => (
+            <VStack key={id}>
+              {Array.from({ length: currMonth.daysForWeek(id) }).map((_, id) => (
+                <div key={id} className="w-7 h-7 border-2 border-[#646464] rounded-md" />
+              ))}
+            </VStack>
+          ))}
+        </HStack>
+      </div>
+    </VStack>
+  );
 }
 
 function Talismans({ character, month }: {
   character: Character;
-  month:     ChronicleMonth;
+  month: ChronicleMonth;
 }) {
-  return <></>
+  return <></>;
 }
