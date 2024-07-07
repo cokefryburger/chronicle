@@ -20,10 +20,11 @@ interface talisman {
 }
 
 interface rank {
-  name:   string;
-  color:  string;
-  title?: string;
-  xp:     number;
+  name:    string;
+  color:   string;
+  title?:  string;
+  xp:      number;
+  suffix?: boolean
 }
 
 enum color {
@@ -72,10 +73,17 @@ const ranks: rank[] = [
     xp: 1000000,
   },
   {
-    name: "Duke",
-    title: "Duke",
+    name: "Mythical",
+    title: "Mythic",
     color: color.unique,
     xp: 5000000
+  },
+  {
+    name: "Conqueror",
+    title: "the Conqueror",
+    color: color.mythic,
+    xp: 10000000,
+    suffix: true
   }
 ];
 
