@@ -3,7 +3,7 @@ import { VStack, HStack } from "@/components/stacks";
 
 type gender = "male" | "female";
 
-class Character {
+export class Character {
   name:      string;
   rank:      rank;
   stats:     stat[];
@@ -40,7 +40,7 @@ class rank {
   rarity: rarity;
   title:  string;
   suffix: boolean = false;
-  xp:     number = 0;
+  xp:     number  = 0;
 
   constructor(name: string, title: string, rarity: rarity, opts: { xp: number, suffix?: boolean }) {
     this.name   = name;
@@ -104,29 +104,42 @@ export default function Home() {
   );
 }
 
-class ChronicleMonth {
-  month:        number;
-  year:         number;
+export class ChronicleMonth {
+  month: number; // 1-indexed
+  year: number;
   amountOfDays: number;
   startWeekday: number;
+  endWeekday: number;
 
   constructor(month: number, year: number) {
-    this.month        = month;
-    this.year         = year;
+    this.month = month;
+    this.year = year;
     this.amountOfDays = new Date(year, month, 0).getDate();
     this.startWeekday = new Date(year, month - 1, 1).getDay();
+    this.endWeekday = new Date(year, month, 0).getDay();
   }
 
+  /* Returns the amount rows needed to display the month considering the start weekday */
   get rows(): number {
     return Math.ceil((this.amountOfDays + this.startWeekday) / 7);
   }
 
+  /* Returns the amount of columns needed to display the month considering how many days in its last week */
   get cols(): number {
     return Math.ceil(this.amountOfDays / 7);
   }
 
+  /* Returns whether or not the given day is in the cells of a month chart */
+  dayInMonth(week: number, day: number): boolean {
+    return (
+      week * 7 + day >= this.startWeekday &&
+      week * 7 - this.startWeekday + day < this.amountOfDays
+    );
+  }
+
+  /* Returns the amount of days in the given week */
   daysForWeek(week: number): number {
-    return Math.min(7, this.amountOfDays - (week * 7));
+    return Math.min(7, this.amountOfDays - week * 7);
   }
 }
 
@@ -134,34 +147,35 @@ const monthNames = [
   "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
 ];
 
-function Stats({ character }: { character: Character }) {
+function Stats({ character, angle = 'cols' }: { character: Character, angle?: 'cols' | 'rows' }) {
   var currYearVal = new Date().getFullYear();
   var currMonthVal = new Date().getMonth();
 
   var months: ChronicleMonth[] = [];
-  for (var i = 1; i <= 12; i++)
-    months.push(new ChronicleMonth(i, currYearVal));
+  for (var i = 1; i <= 12; i++) months.push(new ChronicleMonth(i, currYearVal));
   const currMonth = months[currMonthVal];
 
   return (
     <VStack className="items-center space-y-4 text-2xl text-[#f7a22d] font-gaelic">
-      {/* <div>
-        <h3>
-          The {currYearVal}
-          <sup>th</sup> Year
-        </h3>
-      </div> */}
       <div>
-        {/* single month cols of 7 days for now */}
-        <HStack>
-          {Array.from({ length: currMonth.cols }).map((_, id) => (
-            <VStack key={id}>
-              {Array.from({ length: currMonth.daysForWeek(id) }).map((_, id) => (
-                <div key={id} className="w-7 h-7 border-2 border-[#646464] rounded-md" />
+        <h3>
+          {monthNames[currMonthVal]}{" "} of the {currYearVal}<sup>th</sup> Year
+        </h3>
+      </div>
+      <div>
+        <VStack className="space-y-2">
+          {Array.from({ length: currMonth.rows }).map((_, week) => (
+            <HStack className="space-x-4" key={week}>
+              {Array.from({ length: 7 }).map((_, day) => (
+                <div
+                  key={day}
+                  className="w-8 h-8 border-2 rounded-[2px]"
+                  style={{ borderColor: currMonth.dayInMonth(week, day) ? "#b87f0d" : "#646464" }}
+                />
               ))}
-            </VStack>
+            </HStack>
           ))}
-        </HStack>
+        </VStack>
       </div>
     </VStack>
   );
