@@ -10,12 +10,15 @@ export class Character {
   gender:    gender;
   journeyed: number;
 
-  constructor(name: string, gender: gender, rank: rank, stats: stat[] = [], journeyed: number = Date.now()) {
+  // constructor with JSON as input
+  constructor({ name, gender, rank, stats, journeyed }: {
+    name: string; gender: gender; rank: rank; stats: stat[]; journeyed?: number;
+  }) {
     this.name      = name;
     this.gender    = gender;
     this.rank      = rank;
     this.stats     = stats;
-    this.journeyed = journeyed;
+    this.journeyed = journeyed ?? Date.now();
   }
 
   get title(): string {
@@ -26,13 +29,19 @@ export class Character {
 interface stat {
   xp:        number;
   name:      string;
-  talismans: talisman[];
+  talismans: { [ddmmyyyy: string]: talisman };
 }
 
 interface talisman {
   level:    number;
   rarity:   string;
-  consumed: number;
+  consumed: date;
+}
+
+interface date {
+  day:   number;
+  month: number;
+  year:  number;
 }
 
 class rank {
@@ -75,35 +84,6 @@ const ranks = {
   conqueror: new rank("Conqueror", "the Conqueror", rarity.mythic, { xp: 10000000, suffix: true }),
 };
 
-export default function Home() {
-  const character = new Character("Napoleon", "male", ranks.knight, []);
-  return (
-    <main
-      className={`
-        flex min-h-screen flex-col space-y-12 p-24
-        bg-black text-white selection:text-red-800
-      `}
-    >
-      <div className="w-fit">
-        <h1 className="text-6xl font-gothic">Chronicle</h1>
-        <h2 className="text-1xl font-gaelic pl-3" style={{ color: character.rank.rarity }}>of {character.title}</h2>
-      </div>
-      <div className="flex flex-row space-x-4 w-full justify-center">
-        {Object.values(ranks).map((rank, id) => (
-          <p
-            key={id}
-            className="text-2xl font-gaelic"
-            style={{ color: rank.rarity }}
-          >
-            {rank.name}
-          </p>
-        ))}
-      </div>
-      <Stats character={character} />
-    </main>
-  );
-}
-
 export class ChronicleMonth {
   month: number; // 1-indexed
   year: number;
@@ -143,11 +123,60 @@ export class ChronicleMonth {
   }
 }
 
+export default function Home() {
+  const character = new Character({
+    name: "Napoleon",
+    gender: "male",
+    rank: ranks.knight,
+    stats: [
+      {
+        name: "Strength",
+        xp: 100,
+        talismans: {
+          '02102024': {
+            level: 1,
+            rarity: rarity.common,
+            consumed: { day: 2, month: 10, year: 2024 }
+          },
+        },
+      },
+    ],
+  });
+
+  return (
+    <main
+      className={`
+        flex min-h-screen flex-col space-y-12 p-24
+        bg-black text-white selection:text-red-800
+      `}
+    >
+      <div className="w-fit">
+        <h1 className="text-6xl font-gothic">Chronicle</h1>
+        <h2 className="text-1xl font-gaelic pl-3" style={{ color: character.rank.rarity }}>of {character.title}</h2>
+      </div>
+      <div className="flex flex-row space-x-4 w-full justify-center">
+        {Object.values(ranks).map((rank, id) => (
+          <p
+            key={id}
+            className="text-2xl font-gaelic"
+            style={{ color: rank.rarity }}
+          >
+            {rank.name}
+          </p>
+        ))}
+      </div>
+      <Stats character={character} />
+    </main>
+  );
+}
+
 const monthNames = [
   "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
 ];
 
-function Stats({ character, angle = 'cols' }: { character: Character, angle?: 'cols' | 'rows' }) {
+function Stats({ character, angle = 'cols' }: {
+  character: Character, angle?: 'cols' | 'rows'
+}) {
   var currYearVal = new Date().getFullYear();
   var currMonthVal = new Date().getMonth();
 
@@ -167,17 +196,31 @@ function Stats({ character, angle = 'cols' }: { character: Character, angle?: 'c
           {Array.from({ length: currMonth.rows }).map((_, week) => (
             <HStack className="space-x-4" key={week}>
               {Array.from({ length: 7 }).map((_, day) => (
-                <div
-                  key={day}
-                  className="w-8 h-8 border-2 rounded-[2px]"
-                  style={{ borderColor: currMonth.dayInMonth(week, day) ? "#b87f0d" : "#646464" }}
-                />
+                currMonth.dayInMonth(week, day)
+                  ? <Talisman key={day} character={character} />
+                  : <GrayTalisman />
               ))}
             </HStack>
           ))}
         </VStack>
       </div>
     </VStack>
+  );
+}
+
+function Talisman({ character }: {
+  character: Character
+}) {
+  return (
+    <div className="w-8 h-8 border-2 rounded-[2px] border-[#b87f0d]">
+      {/*  */}
+    </div>
+  );
+}
+
+function GrayTalisman() {
+  return (
+    <div className="w-8 h-8 border-2 rounded-[2px]" style={{ borderColor: "#646464" }} />
   );
 }
 
