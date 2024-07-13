@@ -10,6 +10,10 @@ body {
   cursor: url('/cursor.webp'), auto;
 }
 
+button {
+  cursor: url('/blue-cursor.webp'), auto;
+}
+
 @layer base {  
   :root {
     --background: 0 0% 100%;
