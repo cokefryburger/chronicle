@@ -44,10 +44,25 @@ interface talisman {
   consumed: date;
 }
 
-interface date {
+class date {
   day:   number;
   month: number;
   year:  number;
+
+  constructor({ day, month, year }: { day: number; month: number; year: number }) {
+    this.day   = day;
+    this.month = month;
+    this.year  = year;
+  }
+
+  toString() {
+    return `${this.day.toString().padStart(2, "0")}${this.month.toString().padStart(2, "0")}${this.year}`;
+  }
+
+  /* Returns DDMMYYYY */
+  static string(day: number, month: number, year: number) {
+    return `${day.toString().padStart(2, "0")}${month.toString().padStart(2, "0")}${year}`;
+  }
 }
 
 class rank {
@@ -123,6 +138,12 @@ class ChronicleMonth {
     );
   }
 
+  /* Returns the date object for the given week and day */
+  dateInMonth(week: number, day: number): date {
+    const dayInMonth = week * 7 - this.startWeekday + day;
+    return new date({ day: dayInMonth + 1, month: this.month, year: this.year });
+  }
+
   /* Returns the amount of days in the given week */
   daysForWeek(week: number): number {
     return Math.min(7, this.amountOfDays - week * 7);
@@ -136,7 +157,7 @@ export {
   rarity,
   ranks,
   ChronicleMonth,
+  date,
   type stat,
   type talisman,
-  type date,
 }
