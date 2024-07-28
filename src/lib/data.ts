@@ -10,6 +10,7 @@ class Character {
   stats:     stat[];
   gender:    gender;
   journeyed: number;
+  version:   number = 1;
 
   // constructor with JSON as input
   constructor({ name, gender, rank, stats, journeyed }: {
